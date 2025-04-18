@@ -1,0 +1,47 @@
+// Converts language code to country code, which speak mostly this language
+// Example: en -> gb
+const flagMapping: Record<string, string> = {
+  en: 'gb',
+  fr: 'fr',
+  es: 'es',
+  de: 'de',
+  it: 'it',
+  ru: 'ru',
+  zh: 'cn',
+  ja: 'jp',
+  ko: 'kr',
+  ar: 'sa',
+  bg: 'bg',
+  cs: 'cz',
+  da: 'dk',
+  el: 'gr',
+  et: 'ee',
+  fa: 'ir',
+  fi: 'fi',
+  he: 'il',
+  hi: 'in',
+  hr: 'hr',
+  hu: 'hu',
+  id: 'id',
+  is: 'is',
+  lv: 'lv',
+  lt: 'lt',
+  ms: 'my',
+  nl: 'nl',
+  no: 'no',
+  pl: 'pl',
+  pt: 'pt',
+  ro: 'ro',
+  sk: 'sk',
+  sl: 'si',
+  sr: 'rs',
+  sv: 'se',
+  th: 'th',
+  tr: 'tr',
+  uk: 'ua',
+  vi: 'vn',
+};
+
+export const languageToMap = (lang: string | undefined): string | undefined => {
+  return lang && flagMapping[lang];
+};

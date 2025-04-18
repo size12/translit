@@ -1,43 +1,86 @@
-import { Tabs } from 'expo-router';
+import { TouchableOpacity } from 'react-native';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Tabs } from 'expo-router';
+import { Fonts } from '@/constants/Fonts';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTheme } from '@/hooks/useTheme';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function TabsLayout() {
+  const { colors } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        headerShown: true,
+        headerStyle: {
+          backgroundColor: colors.LIGHT,
+        },
+        headerTitleStyle: {
+          fontSize: 32,
+          fontFamily: Fonts.Inter_600SemiBold,
+          letterSpacing: -1, // looks way better
+          color: colors.DARK,
+        },
+        tabBarInactiveTintColor: colors.GRAY,
+        tabBarActiveTintColor: colors.ORANGE,
+        tabBarStyle: {
+          backgroundColor: colors.LIGHT,
+          borderColor: colors.LIGHT,
+        },
+        tabBarButton: (props) => {
+          return (
+            <TouchableOpacity onPress={props.onPress} style={props.style}>
+              {props.children}
+            </TouchableOpacity>
+          );
+        },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="bookshelf"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ focused, color, size }) => {
+            return (
+              <MaterialCommunityIcons
+                name="bookshelf"
+                size={size}
+                color={color}
+              />
+            );
+          },
+          tabBarLabel: 'Bookshelf',
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="(ankicards)"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ focused, color, size }) => {
+            return (
+              <MaterialCommunityIcons name="brain" size={size} color={color} />
+            );
+          },
+          tabBarLabel: 'Words',
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          tabBarIcon: ({ focused, color, size }) => {
+            return <Ionicons name="settings-sharp" size={size} color={color} />;
+          },
+          tabBarLabel: 'Settings',
+        }}
+      />
+      <Tabs.Screen
+        name="bookreader"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
