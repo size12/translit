@@ -10,7 +10,7 @@ This is an app to help learn new languages by reading your favourite literature 
 
 ## Quick demo video
 
-video will be soon here...
+https://github.com/user-attachments/assets/586b0876-2e79-406a-9888-d18bbc1a2656
 
 ## Technologies
 
