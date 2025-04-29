@@ -39,4 +39,5 @@ yarn-error.*
 app-example
 
 # builds
-build-*.apk
+build-**.apk
+build-**.aab

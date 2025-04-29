@@ -1,4 +1,5 @@
 import {
+  Alert,
   Pressable,
   PressableStateCallbackType,
   StyleSheet,
@@ -14,7 +15,6 @@ import { useTheme } from '@/hooks/useTheme';
 
 export default function BookMenu() {
   const { bookId, isVisible, hideMenu } = useBookMenu();
-
   const { colors } = useTheme();
 
   const updateReadingStatus = useBookStore(
@@ -43,7 +43,20 @@ export default function BookMenu() {
   };
 
   const handleDeleteBook = () => {
-    bookId && deleteBook(bookId);
+    if (!bookId) return;
+
+    Alert.alert(
+      'Deleting book',
+      'Are you sure that you want to delete this book?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => deleteBook(bookId) },
+      ],
+    );
+
     hideMenu();
   };
 

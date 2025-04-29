@@ -2,13 +2,12 @@ import { StyleSheet, Alert } from 'react-native';
 import React from 'react';
 import * as DocumentPicker from 'expo-document-picker';
 import { TouchableOpacity } from 'react-native';
-import ePub from 'epubjs';
 import { useBookStore } from '@/store/books';
 import { AntDesign } from '@expo/vector-icons';
 import { useTheme } from '@/hooks/useTheme';
 
 export default function BookPicker() {
-  const { addBook } = useBookStore();
+  const { loadBookFromFile } = useBookStore();
   const { colors } = useTheme();
 
   const pickBook = async () => {
@@ -22,22 +21,7 @@ export default function BookPicker() {
         return;
       }
 
-      const fileResponse = await fetch(document.assets[0].uri);
-      const arrayBuffer = await fileResponse.arrayBuffer();
-
-      const book = ePub(arrayBuffer);
-
-      await book.ready;
-
-      const metadata = await book.loaded.metadata;
-      const coverUrl = await book.loaded.cover;
-      const coverBase64 = await book.archive.getBase64(coverUrl);
-
-      await addBook({
-        metadata: { ...metadata, author: metadata.creator },
-        bookPath: document.assets[0].uri,
-        coverImageBase64: coverBase64,
-      });
+      await loadBookFromFile(document.assets[0].uri);
     } catch (err: unknown) {
       if (err instanceof Error) {
         Alert.alert('Error', `Failed add book: ${err.message}`);

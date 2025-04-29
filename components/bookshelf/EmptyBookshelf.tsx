@@ -12,13 +12,27 @@ export default function EmptyBookshelf() {
         backgroundColor: colors.BACKGROUND,
       }}
     >
-      <Text style={{ fontStyle: 'italic', ...styles.emptyBookshelf }}>
+      <Text
+        style={{
+          color: colors.DARK,
+          fontStyle: 'italic',
+          ...styles.emptyBookshelf,
+        }}
+      >
         Bookshelf is empty
       </Text>
-      <Text style={{ fontWeight: '600', ...styles.emptyBookshelf }}>
+      <Text
+        style={{
+          color: colors.DARK,
+          fontWeight: '600',
+          ...styles.emptyBookshelf,
+        }}
+      >
         Add new books
       </Text>
-      <Text style={{ color: 'gray', ...styles.emptyBookshelf, fontSize: 12 }}>
+      <Text
+        style={{ color: colors.GRAY, ...styles.emptyBookshelf, fontSize: 12 }}
+      >
         Supported formats: .epub
       </Text>
     </View>

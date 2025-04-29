@@ -1,5 +1,5 @@
-import { Pressable, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
+import { Alert, Pressable, Text, TouchableOpacity, View } from 'react-native';
+import React, { useRef, useState } from 'react';
 import { AnkiWord } from '@/model/AnkiWord';
 import { useTheme } from '@/hooks/useTheme';
 import { LanguageWord } from '@/model/LanguageWord';
@@ -54,41 +54,87 @@ const LanguageWordItem = ({
 export default function AnkiWordItem({ word }: AnkiWordItemProps) {
   const { colors } = useTheme();
   const isLearned = word.recallRightCount >= recallRightToLearn;
-  const [showMenu, setShowMenu] = useState(false);
   const { deleteWord, updateWord } = useWordsStore();
 
   const handleRestartProgress = () => {
-    updateWord(word.id, (word) => {
-      return {
-        ...word,
-        recallRightCount: 0,
-        repeatDate: new Date(),
-      };
-    });
+    const update = () => {
+      updateWord(word.id, (word) => {
+        return {
+          ...word,
+          recallRightCount: 0,
+          repeatDate: new Date(),
+        };
+      });
+    };
+
+    Alert.alert(
+      'Resetting progress',
+      'Are you sure that you want to reset word progress?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => update(),
+        },
+      ],
+    );
   };
 
   const handleCheckAsLearned = () => {
-    updateWord(word.id, (word) => {
-      return {
-        ...word,
-        recallRightCount: recallRightToLearn,
-      };
-    });
+    const update = () =>
+      updateWord(word.id, (word) => {
+        return {
+          ...word,
+          recallRightCount: recallRightToLearn,
+        };
+      });
+
+    Alert.alert(
+      'Marking as learned',
+      'Are you sure that you want to check this word as learned?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => update(),
+        },
+      ],
+    );
   };
 
   const handleDeleteWord = () => {
-    deleteWord(word.id);
+    Alert.alert(
+      'Deleting word',
+      'Are you sure that you want to delete this word?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => deleteWord(word.id),
+        },
+      ],
+    );
   };
 
   const translationX = useSharedValue(0);
+  const showMenu = useRef(false);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translationX.value }],
   }));
 
   const toggleMenu = () => {
-    setShowMenu((state) => !state);
-    translationX.value = withTiming(!showMenu ? -200 : 0, { duration: 200 });
+    showMenu.current = !showMenu.current;
+    translationX.value = withTiming(showMenu.current ? -200 : 0, { duration: 200 });
   };
 
   return (
@@ -138,13 +184,16 @@ export default function AnkiWordItem({ word }: AnkiWordItemProps) {
         onPress={toggleMenu}
       >
         <LanguageWordItem word={word.original} align="left" />
-        <View
-          style={{
-            width: 1,
-            height: '100%',
-            backgroundColor: colors.LIGHTGRAY,
-          }}
-        />
+        <View style={{ flexDirection: 'column', gap: 5, justifyContent: "space-between", alignItems: "center" }}>
+          <View
+            style={{
+              width: 1,
+              flexGrow: 1,
+              backgroundColor: isLearned ? colors.BACKGROUND : colors.MIDDLEGRAY,
+            }}
+          />
+          <Text style={{ fontFamily: Fonts.Inter_400Regular, color: isLearned ? colors.BACKGROUND : colors.MIDDLEGRAY}}>{word.recallRightCount}/{recallRightToLearn}</Text>
+        </View>
         <LanguageWordItem word={word.translated} align="right" />
       </AnimatedPressable>
     </View>

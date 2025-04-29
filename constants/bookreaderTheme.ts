@@ -13,6 +13,9 @@ export function getReaderTheme(theme: 'light' | 'dark'): Theme {
       margin: '0',
       padding: '0',
     },
+    '*': {
+      color: colors.DARK,
+    },
     a: {
       color: colors.BLUE,
       textDecoration: 'underline',
@@ -42,6 +45,14 @@ export function getReaderTheme(theme: 'light' | 'dark'): Theme {
     img: {
       maxWidth: '100%',
       maxHeight: 'auto',
+      margin: 'auto',
+      textAlign: 'center',
+    },
+    image: {
+      maxWidth: '100%',
+      maxHeight: 'auto',
+      margin: 'auto',
+      textAlign: 'center',
     },
     strong: {
       color: colors.DARK,

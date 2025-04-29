@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BookCard } from '@/components/bookshelf/BookCard';
 import { useBookStore } from '@/store/books';
 import { Book } from '@/model/Book';
@@ -10,14 +10,47 @@ import { BookMenuProvider } from '@/contexts/BookMenuContext';
 import { FlatList } from 'react-native-gesture-handler';
 import { useTheme } from '@/hooks/useTheme';
 import EmptyBookshelf from '@/components/bookshelf/EmptyBookshelf';
+import { bookDownloadURLs } from '@/constants/booksStarterPack';
+import { Asset } from 'expo-asset';
+import * as FileSystem from 'expo-file-system';
 
 export default function BookshelfScreen() {
-  const { books, deleteBook } = useBookStore();
+  const {
+    books,
+    deleteBook,
+    loadBookFromFile,
+    downloadedStarterPack,
+    setDownloadedStarterPack,
+  } = useBookStore();
   const { colors } = useTheme();
 
   const renderBook = (book: Book) => {
     return <BookCard book={book} remove={deleteBook} />;
   };
+
+  useEffect(() => {
+    // Load the books from the starter pack on first launch
+    if (downloadedStarterPack) return;
+
+    bookDownloadURLs.forEach(async (url) => {
+      const asset = Asset.fromModule(url);
+
+      await asset.downloadAsync();
+
+      if (!asset.localUri) return;
+
+      try {
+        await loadBookFromFile(asset.localUri);
+      } catch (e) {
+        console.log('Error loading book from file:', e);
+      }
+
+      // Deleting downloaded book
+      await FileSystem.deleteAsync(asset.localUri);
+    });
+
+    setDownloadedStarterPack(true);
+  }, []);
 
   return (
     <>

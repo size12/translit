@@ -1,20 +1,24 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useWordsStore } from '@/store/words';
+import { recallRightToLearn, useWordsStore } from '@/store/words';
 import AnkiCard from './AnkiCard';
 import { Fonts } from '@/constants/Fonts';
-import { AnkiWord } from '@/model/AnkiWord';
 import { useTheme } from '@/hooks/useTheme';
+import { useMemo } from 'react';
 
 export default function WordsLearner() {
-  const getWordsToLearn = useWordsStore((state) => state.getWordsToLearn);
-  const [words, setWords] = useState<AnkiWord[]>([]);
+  const words = useWordsStore((state) => state.words);
+
+  const currentTime = new Date();
+
+  const wordsToLearn = useMemo(() => {
+    return words.filter(
+      (word) =>
+        word.repeatDate <= currentTime &&
+        word.recallRightCount < recallRightToLearn,
+    );
+  }, [words]);
 
   const { colors } = useTheme();
-
-  useEffect(() => {
-    setWords(getWordsToLearn());
-  }, [getWordsToLearn]);
 
   return (
     <View style={styles.container}>
@@ -22,7 +26,7 @@ export default function WordsLearner() {
         <Text style={{ ...styles.text, color: colors.DARKBLUE }}>
           Good work!{'\n'} You recalled all words!
         </Text>
-        {words.toReversed().map((word) => (
+        {wordsToLearn.toReversed().map((word) => (
           <View style={styles.cardContainer} key={word.id}>
             <AnkiCard word={word} />
           </View>

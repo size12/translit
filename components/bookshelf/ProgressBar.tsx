@@ -10,7 +10,9 @@ export default function ProgressBar({ status }: { status: ReadingStatus }) {
   if (!status.startedReading) {
     return (
       <View style={styles.container}>
-        <Text style={styles.progressText}>Didn't start reading</Text>
+        <Text style={{ ...styles.progressText, color: colors.DARK }}>
+          Didn't start reading
+        </Text>
       </View>
     );
   }
