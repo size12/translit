@@ -15,6 +15,8 @@ export interface addBookProps {
 interface BookStore {
   books: Book[];
   downloadedStarterPack: boolean;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
   setDownloadedStarterPack: (value: boolean) => void;
   loadBookFromFile: (bookPath: string) => Promise<void>;
   addBook: (props: addBookProps) => Promise<void>;
@@ -31,6 +33,12 @@ export const useBookStore = create(
     (set, get) => ({
       books: [],
       downloadedStarterPack: false,
+      _hasHydrated: false,
+      setHasHydrated: (state: boolean) => {
+        set({
+          _hasHydrated: state,
+        });
+      },
       setDownloadedStarterPack: (value: boolean) => {
         set({ downloadedStarterPack: value });
       },
@@ -149,6 +157,10 @@ export const useBookStore = create(
     {
       name: 'bookshelf',
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        state.setHasHydrated(true);
+      },
     },
   ),
 );

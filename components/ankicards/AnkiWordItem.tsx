@@ -1,5 +1,5 @@
 import { Alert, Pressable, Text, TouchableOpacity, View } from 'react-native';
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { AnkiWord } from '@/model/AnkiWord';
 import { useTheme } from '@/hooks/useTheme';
 import { LanguageWord } from '@/model/LanguageWord';
@@ -134,7 +134,9 @@ export default function AnkiWordItem({ word }: AnkiWordItemProps) {
 
   const toggleMenu = () => {
     showMenu.current = !showMenu.current;
-    translationX.value = withTiming(showMenu.current ? -200 : 0, { duration: 200 });
+    translationX.value = withTiming(showMenu.current ? -200 : 0, {
+      duration: 200,
+    });
   };
 
   return (
@@ -184,15 +186,31 @@ export default function AnkiWordItem({ word }: AnkiWordItemProps) {
         onPress={toggleMenu}
       >
         <LanguageWordItem word={word.original} align="left" />
-        <View style={{ flexDirection: 'column', gap: 5, justifyContent: "space-between", alignItems: "center" }}>
+        <View
+          style={{
+            flexDirection: 'column',
+            gap: 5,
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
           <View
             style={{
               width: 1,
               flexGrow: 1,
-              backgroundColor: isLearned ? colors.BACKGROUND : colors.MIDDLEGRAY,
+              backgroundColor: isLearned
+                ? colors.BACKGROUND
+                : colors.MIDDLEGRAY,
             }}
           />
-          <Text style={{ fontFamily: Fonts.Inter_400Regular, color: isLearned ? colors.BACKGROUND : colors.MIDDLEGRAY}}>{word.recallRightCount}/{recallRightToLearn}</Text>
+          <Text
+            style={{
+              fontFamily: Fonts.Inter_400Regular,
+              color: isLearned ? colors.BACKGROUND : colors.MIDDLEGRAY,
+            }}
+          >
+            {word.recallRightCount}/{recallRightToLearn}
+          </Text>
         </View>
         <LanguageWordItem word={word.translated} align="right" />
       </AnimatedPressable>

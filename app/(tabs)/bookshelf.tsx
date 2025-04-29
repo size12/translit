@@ -21,6 +21,7 @@ export default function BookshelfScreen() {
     loadBookFromFile,
     downloadedStarterPack,
     setDownloadedStarterPack,
+    _hasHydrated,
   } = useBookStore();
   const { colors } = useTheme();
 
@@ -30,7 +31,7 @@ export default function BookshelfScreen() {
 
   useEffect(() => {
     // Load the books from the starter pack on first launch
-    if (downloadedStarterPack) return;
+    if (!_hasHydrated || downloadedStarterPack) return;
 
     bookDownloadURLs.forEach(async (url) => {
       const asset = Asset.fromModule(url);
@@ -47,10 +48,11 @@ export default function BookshelfScreen() {
 
       // Deleting downloaded book
       await FileSystem.deleteAsync(asset.localUri);
-    });
 
-    setDownloadedStarterPack(true);
-  }, []);
+      // Downloaded at least one book
+      setDownloadedStarterPack(true);
+    });
+  }, [_hasHydrated]);
 
   return (
     <>
