@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslateModal } from '@/contexts/TranslateModalContext';
-import ModalCard from '../shared/ModalCard';
+import ModalCard from './ModalCard';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
 import { Fonts } from '@/constants/Fonts';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -272,8 +272,8 @@ export default function TranslateModal() {
 
 const styles = StyleSheet.create({
   webviewContainer: {
-    height: '70%',
-    width: '100%',
+    height: Dimensions.get("screen").height / 100 * 70, // 70%
+    width: Dimensions.get("screen").width,
     overflow: 'hidden',
     borderTopRightRadius: 18,
     borderTopLeftRadius: 18,

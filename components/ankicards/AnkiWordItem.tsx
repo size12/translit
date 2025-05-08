@@ -13,6 +13,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { useTranslateModal } from '@/contexts/TranslateModalContext';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -55,6 +56,7 @@ export default function AnkiWordItem({ word }: AnkiWordItemProps) {
   const { colors } = useTheme();
   const isLearned = word.recallRightCount >= recallRightToLearn;
   const { deleteWord, updateWord } = useWordsStore();
+  const { translateWord } = useTranslateModal()
 
   const handleRestartProgress = () => {
     const update = () => {
@@ -108,6 +110,24 @@ export default function AnkiWordItem({ word }: AnkiWordItemProps) {
     );
   };
 
+  const handleTranslate = () => {
+      translateWord(word.original.text, word.original.language || "")
+  }
+
+  const translationX = useSharedValue(0);
+  const showMenu = useRef(false);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translationX.value }],
+  }));
+
+  const toggleMenu = () => {
+    showMenu.current = !showMenu.current;
+    translationX.value = withTiming(showMenu.current ? -250 : 0, {
+      duration: 200,
+    });
+  };
+
   const handleDeleteWord = () => {
     Alert.alert(
       'Deleting word',
@@ -119,24 +139,13 @@ export default function AnkiWordItem({ word }: AnkiWordItemProps) {
         },
         {
           text: 'OK',
-          onPress: () => deleteWord(word.id),
+          onPress: () => {
+            toggleMenu()
+            deleteWord(word.id)
+          },
         },
       ],
     );
-  };
-
-  const translationX = useSharedValue(0);
-  const showMenu = useRef(false);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translationX.value }],
-  }));
-
-  const toggleMenu = () => {
-    showMenu.current = !showMenu.current;
-    translationX.value = withTiming(showMenu.current ? -200 : 0, {
-      duration: 200,
-    });
   };
 
   return (
@@ -158,6 +167,9 @@ export default function AnkiWordItem({ word }: AnkiWordItemProps) {
           right: 0,
         }}
       >
+        <TouchableOpacity onPress={handleTranslate}>
+          <MaterialIcons name="translate" size={32} color={colors.GRAY} />
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleRestartProgress}>
           <MaterialIcons name="restart-alt" size={32} color={colors.DARKBLUE} />
         </TouchableOpacity>
