@@ -58,7 +58,11 @@ export default function TabsLayout() {
           options={{
             tabBarIcon: ({ focused, color, size }) => {
               return (
-                <MaterialCommunityIcons name="brain" size={size} color={color} />
+                <MaterialCommunityIcons
+                  name="brain"
+                  size={size}
+                  color={color}
+                />
               );
             },
             tabBarLabel: 'Words',
@@ -68,7 +72,9 @@ export default function TabsLayout() {
           name="settings"
           options={{
             tabBarIcon: ({ focused, color, size }) => {
-              return <Ionicons name="settings-sharp" size={size} color={color} />;
+              return (
+                <Ionicons name="settings-sharp" size={size} color={color} />
+              );
             },
             tabBarLabel: 'Settings',
           }}
