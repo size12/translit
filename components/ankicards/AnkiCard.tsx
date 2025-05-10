@@ -1,4 +1,11 @@
-import { Dimensions, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, { useState } from 'react';
 import { Fonts } from '@/constants/Fonts';
 import CountryFlag from '@/components/shared/CountryFlag';
@@ -36,7 +43,7 @@ export default function AnkiCard({ word }: AnkiCardProps) {
   const [showTranslation, setShowTranslation] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const { rememberedWord, forgotWord } = useWordsStore();
-  const { translateWord } = useTranslateModal()
+  const { translateWord } = useTranslateModal();
 
   // Swipe animation
   const translationX = useSharedValue(0);
@@ -89,7 +96,12 @@ export default function AnkiCard({ word }: AnkiCardProps) {
           { shadowColor: colors.DARK, backgroundColor: colors.LIGHT },
         ]}
       >
-        <TouchableOpacity onPress={() => translateWord(word.original.text, word.original.language || "")} style={styles.translateIcon} >
+        <TouchableOpacity
+          onPress={() =>
+            translateWord(word.original.text, word.original.language || '')
+          }
+          style={styles.translateIcon}
+        >
           <MaterialIcons name="translate" size={32} color={colors.GRAY} />
         </TouchableOpacity>
         <Text style={{ ...styles.cardTitle, color: colors.DARKBLUE }}>
@@ -113,6 +125,13 @@ export default function AnkiCard({ word }: AnkiCardProps) {
             />
             <Text style={{ ...styles.example, color: colors.GRAY }}>
               {word.example}
+            </Text>
+          </>
+        )}
+        {!showTranslation && word.original.transcription && (
+          <>
+            <Text style={{ ...styles.example, color: colors.GRAY }}>
+              {word.original.transcription}
             </Text>
           </>
         )}
@@ -164,8 +183,8 @@ const styles = StyleSheet.create({
   },
   translateIcon: {
     opacity: 0.5,
-    position: "absolute",
+    position: 'absolute',
     top: 20,
-    left: 20
-  }
+    left: 20,
+  },
 });

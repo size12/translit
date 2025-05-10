@@ -2,4 +2,5 @@
 export interface LanguageWord {
   language?: string;
   text: string;
+  transcription?: string;
 }

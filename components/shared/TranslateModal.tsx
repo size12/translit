@@ -75,39 +75,60 @@ const injectJS = `
             {
               "event": "event.target",
               "selector": "div#dstBox span",
+            },
+            {
+              "event": "event.transcription",
+              "selector": "span.dict-title-part_type_transcription",
             }
           ]
 
+          // Функция для наблюдения за изменениями текста в элементе
           function observeTextChanges(event, element) {
               const textObserver = new MutationObserver(() => {
-                  sendMessageRN(event, "ok", element.textContent)
+                  sendMessageRN(event, "ok", element.textContent);
               });
 
               textObserver.observe(element, { characterData: true, childList: true, subtree: true });
+              return textObserver; // Возвращаем observer для возможного отключения
           }
 
-          const startObserving = () => {
-              sendMessageRN("test", "ok", "hello from webview!")
-
-              observingSelectors.map(item => {
-                const element = document.querySelector(item.selector)
-                if (!element) return
-
-                console.log(element)
-                
-                sendMessageRN(item.event, "ok", element.textContent)
-                observeTextChanges(item.event, element)
-              })
+          // Функция для проверки и инициализации наблюдения за элементами
+          function setupObserversForElements() {
+              observingSelectors.forEach(item => {
+                  const elements = document.querySelectorAll(item.selector);
+                  elements.forEach(element => {
+                      // Проверяем, не наблюдается ли уже этот элемент
+                      if (!element.__observed__) {
+                          sendMessageRN(item.event, "ok", element.textContent);
+                          observeTextChanges(item.event, element);
+                          element.__observed__ = true; // Помечаем как наблюдаемый
+                      }
+                  });
+              });
           }
 
-          startObserving()
+          // Главный наблюдатель для новых элементов
+          const mainObserver = new MutationObserver((mutations) => {
+              mutations.forEach(() => {
+                  setupObserversForElements();
+              });
+          });
+
+          // Начинаем наблюдение за всем документом
+          mainObserver.observe(document.body, {
+              childList: true,
+              subtree: true
+          });
+
+          // Инициализация наблюдателей для существующих элементов
+          setupObserversForElements();
       }
   })()
 
   return true; // for android webview
 `;
 interface TranslationMessageJS {
-  event: 'event.source' | 'event.target';
+  event: 'event.source' | 'event.target' | 'event.transcription';
   status: 'ok' | 'error';
   data: string;
 }
@@ -128,6 +149,7 @@ export default function TranslateModal() {
   const translationResult = useRef('');
   const sourceWord = useRef('');
   const lastTranslatedSourceWord = useRef('');
+  const transcriptonRef = useRef('');
 
   const TRANSLATE_URL_TEMPLATE = `https://translate.yandex.ru/?source_lang=${language}&target_lang=${userLanguage}&text=`;
 
@@ -178,6 +200,13 @@ export default function TranslateModal() {
       translationResult.current = result.data;
       return;
     }
+
+    if (result.event === 'event.transcription') {
+      // new transcription is ready
+      transcriptonRef.current = result.data.trim();
+
+      return;
+    }
   };
 
   const saveWord = () => {
@@ -187,6 +216,7 @@ export default function TranslateModal() {
       original: {
         language: language,
         text: lastTranslatedSourceWord.current,
+        transcription: transcriptonRef.current,
       },
       translated: {
         language: userLanguage,
@@ -272,8 +302,8 @@ export default function TranslateModal() {
 
 const styles = StyleSheet.create({
   webviewContainer: {
-    height: Dimensions.get("screen").height / 100 * 70, // 70%
-    width: Dimensions.get("screen").width,
+    height: (Dimensions.get('screen').height / 100) * 70, // 70%
+    width: Dimensions.get('screen').width,
     overflow: 'hidden',
     borderTopRightRadius: 18,
     borderTopLeftRadius: 18,
