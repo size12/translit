@@ -1,4 +1,4 @@
-import { Modal, Pressable } from 'react-native';
+import { Modal, Pressable, View } from 'react-native';
 import React from 'react';
 
 export interface ModalProps {
@@ -13,14 +13,16 @@ export default function ModalCard({
   hideModal,
 }: ModalProps) {
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isVisible}
-      onRequestClose={hideModal}
-    >
-      <Pressable style={{ flex: 1, opacity: 1 }} onPressIn={hideModal} />
-      {children}
-    </Modal>
+    <View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isVisible}
+        onRequestClose={hideModal}
+      >
+        <Pressable style={{ flex: 1, opacity: 1 }} onPressIn={hideModal} />
+        {children}
+      </Modal>
+    </View>
   );
 }

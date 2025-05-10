@@ -1,7 +1,6 @@
 import { View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useTranslateModal } from '@/contexts/TranslateModalContext';
-import TranslateModal from '@/components/bookreader/TranslateModal';
 import { Location, useReader } from '@epubjs-react-native/core';
 import { Reader } from '@epubjs-react-native/core';
 import { Book } from '@/model/Book';
@@ -119,7 +118,6 @@ export default function BookReader() {
           flow="scrolled"
         />
       </View>
-      <TranslateModal />
     </>
   );
 }

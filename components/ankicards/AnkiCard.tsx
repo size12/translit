@@ -1,4 +1,11 @@
-import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, { useState } from 'react';
 import { Fonts } from '@/constants/Fonts';
 import CountryFlag from '@/components/shared/CountryFlag';
@@ -15,6 +22,8 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { snapPoint } from 'react-native-redash';
 import { useWordsStore } from '@/store/words';
 import { useTheme } from '@/hooks/useTheme';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useTranslateModal } from '@/contexts/TranslateModalContext';
 
 export interface AnkiCardProps {
   word: AnkiWord;
@@ -34,6 +43,7 @@ export default function AnkiCard({ word }: AnkiCardProps) {
   const [showTranslation, setShowTranslation] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const { rememberedWord, forgotWord } = useWordsStore();
+  const { translateWord } = useTranslateModal();
 
   // Swipe animation
   const translationX = useSharedValue(0);
@@ -86,6 +96,14 @@ export default function AnkiCard({ word }: AnkiCardProps) {
           { shadowColor: colors.DARK, backgroundColor: colors.LIGHT },
         ]}
       >
+        <TouchableOpacity
+          onPress={() =>
+            translateWord(word.original.text, word.original.language || '')
+          }
+          style={styles.translateIcon}
+        >
+          <MaterialIcons name="translate" size={32} color={colors.GRAY} />
+        </TouchableOpacity>
         <Text style={{ ...styles.cardTitle, color: colors.DARKBLUE }}>
           {showTranslation ? word.translated.text : word.original.text}{' '}
           <CountryFlag
@@ -107,6 +125,13 @@ export default function AnkiCard({ word }: AnkiCardProps) {
             />
             <Text style={{ ...styles.example, color: colors.GRAY }}>
               {word.example}
+            </Text>
+          </>
+        )}
+        {!showTranslation && word.original.transcription && (
+          <>
+            <Text style={{ ...styles.example, color: colors.GRAY }}>
+              {word.original.transcription}
             </Text>
           </>
         )}
@@ -155,5 +180,11 @@ const styles = StyleSheet.create({
   },
   flag: {
     opacity: 0.7,
+  },
+  translateIcon: {
+    opacity: 0.5,
+    position: 'absolute',
+    top: 20,
+    left: 20,
   },
 });
