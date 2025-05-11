@@ -18,6 +18,7 @@ interface WordsStore {
     modifyWord: (word: AnkiWord) => AnkiWord,
   ) => void;
   findWord: (sourceWord: string) => AnkiWord | undefined;
+  deleteLearnedWords: () => void;
 }
 
 // Leitner system
@@ -125,6 +126,13 @@ export const useWordsStore = create(
         deleteWord: (wordId: string) => {
           set(({ words }) => ({
             words: words.filter((word) => word.id !== wordId),
+          }));
+        },
+        deleteLearnedWords: () => {
+          set(({ words }) => ({
+            words: words.filter(
+              (word) => word.recallRightCount < recallRightToLearn,
+            ),
           }));
         },
       };
