@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Dimensions, Pressable, StyleSheet, View } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslateModal } from '@/contexts/TranslateModalContext';
 import ModalCard from './ModalCard';
@@ -14,6 +14,7 @@ import { useSettingsStore } from '@/store/settings';
 import { useWordsStore } from '@/store/words';
 import { AnkiWord } from '@/model/AnkiWord';
 import { useTheme } from '@/hooks/useTheme';
+import { TouchableOpacity } from 'react-native';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const AnimatedMaterialIcon = Animated.createAnimatedComponent(MaterialIcons);
@@ -144,7 +145,8 @@ export default function TranslateModal() {
 
   const userLanguage = useSettingsStore((state) => state.userLanguage);
   const addWord = useWordsStore((state) => state.addWord);
-  const haveWordAlready = useWordsStore((state) => state.haveWordAlready);
+  const findWord = useWordsStore((state) => state.findWord);
+  const deleteWord = useWordsStore((state) => state.deleteWord);
 
   const translationResult = useRef('');
   const sourceWord = useRef('');
@@ -158,6 +160,10 @@ export default function TranslateModal() {
       const trimmed = word.trim();
       setTranslateURL(TRANSLATE_URL_TEMPLATE + encodeURIComponent(trimmed));
       sourceWord.current = trimmed;
+
+      const btnStatus = !!findWord(trimmed) ? 'added' : 'disabled';
+
+      setSaveBtnStatus(btnStatus);
     }
   }, [word]);
 
@@ -174,7 +180,7 @@ export default function TranslateModal() {
       }
       sourceWord.current = result.data;
 
-      const btnStatus = haveWordAlready(sourceWord.current)
+      const btnStatus = !!findWord(sourceWord.current)
         ? 'added'
         : sourceWord.current === lastTranslatedSourceWord.current
           ? 'enabled'
@@ -193,7 +199,7 @@ export default function TranslateModal() {
       }
 
       lastTranslatedSourceWord.current = sourceWord.current;
-      const btnStatus = haveWordAlready(lastTranslatedSourceWord.current)
+      const btnStatus = !!findWord(lastTranslatedSourceWord.current)
         ? 'added'
         : 'enabled';
       setSaveBtnStatus(btnStatus);
@@ -229,6 +235,30 @@ export default function TranslateModal() {
     setSaveBtnStatus('added');
 
     addWord(word);
+  };
+
+  const handleDeleteWord = () => {
+    const word = findWord(lastTranslatedSourceWord.current);
+
+    if (!word) return;
+
+    Alert.alert(
+      'Deleting word',
+      'Are you sure that you want to delete this word?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            deleteWord(word.id);
+            setSaveBtnStatus('enabled');
+          },
+        },
+      ],
+    );
   };
 
   // button animation
@@ -271,7 +301,7 @@ export default function TranslateModal() {
       <View
         style={{ ...styles.webviewContainer, backgroundColor: colors.LIGHT }}
       >
-        <View style={{ padding: 10 }}>
+        <View style={{ padding: 10, flexDirection: 'row', gap: 10 }}>
           <AnimatedPressable
             style={[styles.button, animatedStyle]}
             onPress={saveWord}
@@ -288,6 +318,18 @@ export default function TranslateModal() {
               {saveBtnStatus === 'added' ? 'Added word' : 'Add word'}
             </Animated.Text>
           </AnimatedPressable>
+          {saveBtnStatus === 'added' && (
+            <TouchableOpacity
+              style={{ justifyContent: 'center', alignItems: 'center' }}
+              onPress={handleDeleteWord}
+            >
+              <MaterialIcons
+                name="delete-outline"
+                size={32}
+                color={colors.RED}
+              />
+            </TouchableOpacity>
+          )}
         </View>
         <WebView
           style={styles.webview}
@@ -313,7 +355,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   button: {
-    width: '100%',
+    flexGrow: 1,
     height: 50,
     borderRadius: 18,
     padding: 10,
