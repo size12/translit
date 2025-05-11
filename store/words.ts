@@ -17,7 +17,7 @@ interface WordsStore {
     wordId: string,
     modifyWord: (word: AnkiWord) => AnkiWord,
   ) => void;
-  haveWordAlready: (sourceWord: string) => boolean;
+  findWord: (sourceWord: string) => AnkiWord | undefined;
 }
 
 // Leitner system
@@ -80,14 +80,16 @@ export const useWordsStore = create(
             return { words: [...words, ankiWord] };
           });
         },
-        haveWordAlready: (sourceWord: string) => {
+        findWord: (sourceWord: string) => {
           const { words } = get();
 
-          return (
-            words.findIndex((word) =>
-              wordsEquality(word.original.text, sourceWord),
-            ) !== -1
-          );
+          for (const word of words) {
+            if (wordsEquality(word.original.text, sourceWord)) {
+              return word;
+            }
+          }
+
+          return undefined;
         },
         rememberedWord: (wordId: string) => {
           set(() => ({
